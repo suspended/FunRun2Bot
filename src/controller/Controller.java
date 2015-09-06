@@ -6,8 +6,13 @@ import model.Client;
 import model.Friend;
 import view.EchoBotGUI;
 
+/**
+ * Controller class that communicates with
+ * both the GUI and the Client.
+ * @author Damiene Stewart
+ */
 public class Controller {
-
+	
 	private EchoBotGUI myGUI;
 	
 	private Client myClient;

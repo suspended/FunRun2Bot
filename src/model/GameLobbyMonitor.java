@@ -98,7 +98,7 @@ public class GameLobbyMonitor extends Monitor {
 			break;
 		
 		default:
-			System.out.println(data);
+			break;
 		}
 	}
 	

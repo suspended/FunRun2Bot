@@ -121,7 +121,6 @@ public abstract class Monitor implements Runnable {
 		if (data.charAt(0) == '{') {
 			return new JSONObject(data);
 		} else {
-			System.out.println(data);
 			return new JSONArray(data);
 		}
 	}

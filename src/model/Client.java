@@ -198,6 +198,9 @@ public class Client {
 	 * @param theFriend whose requests should be accepted.
 	 */
 	public void setMyFriend(Friend theFriend) {
+		if (myGameLobbyMonitor != null) {
+			myGameLobbyMonitor.stopMonitor();
+		}
 		myFriend = theFriend;
 	}
 	
