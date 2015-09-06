@@ -34,9 +34,12 @@ public class DataMonitor extends Monitor {
 	 */
 	public void stopDataMonitor() {
 		stopMonitor();
-		myPinger.stopPinger();
-		if (myPingThread.isAlive()) {
-			myPingThread.interrupt();
+		
+		if (myPinger != null) {
+			myPinger.stopPinger();
+			if (myPingThread.isAlive()) {
+				myPingThread.interrupt();
+			}
 		}
 	}
 	

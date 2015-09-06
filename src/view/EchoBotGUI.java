@@ -281,7 +281,8 @@ public class EchoBotGUI extends Application {
 	 * The login scene is discarded until it is needed again.
 	 */
 	public void showMainScene() {
-		createMainScene();
+		myMainScene = createMainScene();
+		
 		myStage.setScene(myMainScene);
 		myStage.sizeToScene();
 		

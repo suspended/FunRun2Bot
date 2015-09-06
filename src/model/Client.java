@@ -19,6 +19,12 @@ import org.json.JSONObject;
 
 import controller.Controller;
 
+/**
+ * The Client class that interacts with the server
+ * and does the majority of the heavy lifting for the
+ * rest of the application.
+ * @author Damiene Stewart
+ */
 public class Client {
 	
 	/**
@@ -32,19 +38,10 @@ public class Client {
 	private String myToken;
 	
 	/**
-	 * The friend to accept requests from.
+	 * Stores a string describing any login
+	 * errors that may have occurred.
 	 */
-	private Friend myFriend;
-	
-	/**
-	 * The friend list.
-	 */
-	private ArrayList<Friend> myFriendList;
-	
-	/**
-	 * The data monitoring thread.
-	 */
-	private Monitor myDataMonitor;
+	private String myLoginErrorMessage;
 	
 	/**
 	 * The lobby status.
@@ -57,28 +54,39 @@ public class Client {
 	private int myStatus;
 	
 	/**
-	 * Stores a string describing any login
-	 * errors that may have occurred.
+	 * The friend to accept requests from.
 	 */
-	private String myLoginErrorMessage;
+	private Friend myFriend;
+	
+	/**
+	 * The friend list.
+	 */
+	private ArrayList<Friend> myFriendList;
 	
 	/**
 	 * The controller for this model.
 	 */
 	private Controller myController;
+	
+	/**
+	 * The data monitoring runnable task..
+	 */
+	private Runnable myDataMonitor;
 
-	private GameLobbyMonitor myGameLobbyMonitor;
+	/**
+	 * The game lobby monitoring task.
+	 */
+	private Runnable myGameLobbyMonitor;
 	
 	/**
 	 * Constructs a new client object.
 	 */
 	public Client(Controller theController) {
 		myID = myToken = "Not present";
-		myStatus = 1;
+		myStatus = 3;
 		myLobbyStatus = false;
 		myLoginErrorMessage = "";
 		myFriend = null;
-		
 		myDataMonitor = new DataMonitor(this);
 		myFriendList = new ArrayList<Friend>();
 		myController = theController;
@@ -134,16 +142,29 @@ public class Client {
 		return false;
 	}
 	
+	/**
+	 * Start the data monitor task.
+	 */
 	public void startDataMonitor() {
 		// Start the data monitor.
 		((DataMonitor) myDataMonitor).startPinger();
 		(new Thread(myDataMonitor)).start();
 	}
 	
+	/**
+	 * Return the login error message. Clears the message
+	 * afterwards.
+	 * @return A message about a recent login failure.
+	 */
 	public String getLoginErrorMessage() {
 		return myLoginErrorMessage;
 	}
 	
+	/**
+	 * Construct the friend list from the incoming JSON
+	 * data.
+	 * @param theData the incoming data.
+	 */
 	public void createFriendList(JSONArray theData) {
 		for(int i = 0; i < theData.length(); i++) {
 			JSONObject friend = theData.getJSONObject(i);
@@ -151,7 +172,7 @@ public class Client {
 			myFriendList.add(f);
 		}
 		
-		myController.loggedIn();
+		myController.setLoggedIn(true);
 	}
 	
 	/**
@@ -199,7 +220,7 @@ public class Client {
 	 */
 	public void setMyFriend(Friend theFriend) {
 		if (myGameLobbyMonitor != null) {
-			myGameLobbyMonitor.stopMonitor();
+			((Monitor) myGameLobbyMonitor).stopMonitor();
 		}
 		myFriend = theFriend;
 	}
@@ -232,6 +253,19 @@ public class Client {
 	 */
 	public void toggleLobbyStatus() {
 		myLobbyStatus = myLobbyStatus ^ true;
+	}
+	
+	/**
+	 * Initiate shutdown sequence.
+	 */
+	public void shutdown() {
+		if (myDataMonitor != null) {
+			((DataMonitor) myDataMonitor).stopDataMonitor();
+		}
+		
+		if (myGameLobbyMonitor != null) {
+			((Monitor) myGameLobbyMonitor).stopMonitor();
+		}
 	}
 	
 	/**
@@ -322,16 +356,5 @@ public class Client {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void shutdown() {
-		if (myDataMonitor != null) {
-			((DataMonitor) myDataMonitor).stopDataMonitor();
-		}
-		
-		if (myGameLobbyMonitor != null) {
-			myGameLobbyMonitor.stopMonitor();
-		}
-	}
-	
+	}	
 }
